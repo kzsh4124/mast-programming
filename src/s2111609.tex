@@ -1,0 +1,55 @@
+\RequirePackage{plautopatch}
+% 一応pLaTeX用パッチを当てておく
+% クラスオプションでdvipdfmxを読み込めばusepackageで個別に指定する必要がなくなる
+% jarticleは非推奨なので使いたくないが、レギュレーションなので大変遺憾に思いつつ従う
+\documentclass[dvipdfmx,twocolumn,12pt]{jarticle}
+% dvipdfmxはグローバルオプションとして読み込んでいるので不要
+\usepackage{graphicx}
+% ロゴ関係
+\usepackage{hologo}
+\usepackage{bxtexlogo}
+\bxtexlogoimport{*,**}
+% Hオプションを使いたいので読み込む
+\usepackage{here}
+% ソースコードを表示するのに読み込む
+\usepackage{listing}
+% シンタックスハイライトのため
+\usepackage{xcolor}
+% 枠かこみのため
+\usepackage{tcolorbox}
+\title{プログラミング　第1回レポート}
+\author{202111609　仲村和士}
+\date{\today}
+
+\begin{document}
+\maketitle
+\section{はじめに}
+課題内容を始める前に重要なことを何点かこの節で述べる。
+
+\subsection{\BibTeX のコンパイルについて(重要)}
+はじめに本レポートをコンパイルする際の注意点について述べたい。本レポートの文献情報には日本語書籍が含まれている。したがって通常の\BibTeX ではなく\pBibTeX を利用することを推奨する。
+\begin{verbatim}
+  $ pbibtex -kanji=utf-8 file_name
+\end{verbatim}
+
+\subsection{\LaTeX 利用の方針}
+随時インターネットで調べた結果を活用するが、日本語\LaTeX の代表的書籍である、奥村、黒木~\cite{bibunsho}に記述があるものはこれに従う。講義資料と齟齬がある点についてはその都度記述する。
+
+ただし、例外的にjarticleを利用する点のみ前述の書籍の記述から外れるものとする。\LaTeX の作法としては非推奨であるが、今回のレポートのレギュレーションである以上それに従うものとする。
+
+\section{Linuxのコマンド利用}
+
+\section{ソースコードの挿入}
+\subsection{課題内容と方針}
+
+\section{本の紹介}
+イントロ1\verb+~+2文述べる。
+\begin{itemize}
+  \item 本1 \cite{bibunsho}
+  \item 本2
+  \item 本3
+\end{itemize}
+
+\bibliographystyle{jplain}
+\bibliography{citation}
+\end{document}
