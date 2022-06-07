@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include <stdlib.h>
-#include<time.h>
 
 #define SSIZE 100
 
@@ -34,21 +33,48 @@ int randint(int a, int b){
     return a-1 + myrand(b-a+1);
   }
 }
-int main(void){
-    int a,b,c;
+void play_A(void){
+    int a, b, c;
     int n;
     n = randint(6,90);
-    printf("a * b + c = %d\n", n);
-    /* aの入力 */
-    a = input_valid_int("a");
-    /* bの入力 */
-    b = input_valid_int("b");
-    /* cの入力 */
-    c = input_valid_int("c");
-    
-    if(a * b + c == n){
-      printf("good!\n");
-    }else{
-      printf("bad!\n");
+    printf("a * b + c = %d\n",n);
+    while(1){
+      /* aの入力 */
+      a = input_valid_int("a");
+      /* bの入力 */
+      b = input_valid_int("b");
+      /* cの入力 */
+      c = input_valid_int("c");
+      
+      if(a * b + c == n){
+        printf("good!\n");
+        break;
+      }else{
+        printf("bad!\n");
+      }
     }
+}
+void play_B(void){
+    int a, b, c;
+    int n;
+    n = randint(0, 79);
+    printf("a * b - c = %d\n",n);
+    while(1){
+      /* aの入力 */
+      a = input_valid_int("a");
+      /* bの入力 */
+      b = input_valid_int("b");
+      /* cの入力 */
+      c = input_valid_int("c");
+      
+      if(a * b - c == n){
+        printf("good!\n");
+        break;
+      }else{
+        printf("bad!\n");
+      }
+    }
+}
+int main(void){
+    play_B();
 }
