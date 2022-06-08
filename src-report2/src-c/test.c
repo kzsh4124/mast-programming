@@ -34,7 +34,8 @@ void play_A(void){
     int n;
     do{
         n = randint(6,90);
-    }while(n == 82);
+    }while(n >= 40);
+    n = randint(6,90);
     printf("a * b + c = %d\n",n);
     while(1){
       a = mygetint("a");
@@ -70,12 +71,7 @@ void play_B(void){
     }
 }
 int main(void){
-    int rand_expression;
     srand(time(NULL));
-    rand_expression = randint(0,1);
-    if(rand_expression == 0){
-        play_A();
-    }else{
-        play_B();
-    }
+    play_A();
+
 }

@@ -5,6 +5,7 @@
 \documentclass[dvipdfmx,12pt,a4j]{jarticle}
 % dvipdfmxはグローバルオプションとして読み込んでいるので個別のパッケージのオプションとしては不要
 \usepackage{graphicx}
+\usepackage{amsmath,amsbsy}
 % ロゴ関係
 \usepackage{bxtexlogo}
 \bxtexlogoimport{*,**}
@@ -36,7 +37,7 @@
 % listingsのスタイル定義
 \lstdefinestyle{c}{
   language=c,
-  numbers=left
+  numbers=left,
 }
 \lstset{
 basicstyle=\small\ttfamily\color{solarized@base00},
@@ -51,20 +52,310 @@ sensitive=true,
 breaklines=true,
 breakatwhitespace=true,
 framerule=0pt,
-frame=l
+frame=l,
 showstringspaces=false,
 tabsize=2,
 basewidth={0.57em,0.52em},
 }
-\title{プログラミング　第1回レポート}
+\title{プログラミング　第2回レポート}
 \author{202111609　仲村和士}
 \date{\today}
 
 \begin{document}
+\maketitle
+
 \section{はじめに}
 \subsection{はじめにについて}
 今回のレポートには、前回と異なり、はじめにの"節"が必要らしい。よって書く内容が特にあるわけではないが、この節を設けた。
+
 \subsection{確認}
 今回ははじめにの節を設けることが要求されている。その中で書く内容については特に要求はない。よって題意を満たす。
 
+\section{設問(1)}
+\subsection{課題概要と方針}
+本課題は定義されたgetint関数を利用してa, b, cの値を取得するという課題である。その他の条件はプロンプトを半角文字で表示させることである。これらの実装はgetint関数とprintf関数を順次並べることで実現できる。
+
+\subsection{実装}
+早速実装を提示する。以下の実装の処理の流れを説明すると、前述の2つの関数を、main関数でまずプロンプトの表示、次に標準入力となるように交互に呼び出しているだけである。そして最後に標準出力をして終了である。
+\lstinputlisting[caption=keisan01.c,style=c]{./src-c/keisan01.c}
+
+\subsection{確認}
+このプログラムは分岐などはないので一度実行して予期される動作が見られれば十分である。なお、このプログラムの入力として想定されるのはint型数値である。次に実行結果を示す。
+\begin{verbatim}
+  $ cc -std=c89 keisan01.c
+  $ ./a.out
+  input an interger number(a): 3
+  input an interger number(b): 5
+  input an interger number(c): 17
+  value (a) is 3
+  value (b) is 5
+  value (c) is 17
+\end{verbatim}
+
+\subsection{難しかった点など}
+特になかった。
+
+\section{設問(2)}
+\subsection{課題内容と方針}
+この課題は(1)で受け取る値を整数2-9に制限して、条件に合致する値が得られるまで無限に入力を繰り返す関数mygetintを作成するという内容である。
+全体の方針として、C言語はオブジェクト指向言語ではないので、より扱いやすいコードを作成するには、処理を関数にまとめていくことが最もよいと思われる。よって以降の課題でも積極的に関数を作成する。
+この設問を解くには、while(1)を用いて無限ループを作り出し、if文で条件に合致する入力が得られた際にループを抜ければ良い。範囲外のメッセージはelse部に記述する。
+
+\subsection{実装}
+実装を提示する。11行目からmygetintを定義している。引数に文字列を取っているのは、変数名が必要な入力のプロンプトもまとめてこの関数内で表示するように実装しているからである。他の例を見てもそのほうが自然であると考えられる(例:ログイン認証など\footnote{ログイン認証やパスワードによるssh接続では、ミスがあった際にその旨のメッセージを表示した後、もとのプロンプトを表示する。})。13行目からは前述の通りのwhile(1)によるループであり、内部のif-else文でループを抜けるか、ループを抜けずにメッセージを表示するかを判定する。main関数はgetint + printfを用いた実装だった部分をまるまるmygetintに置き換えている。
+\lstinputlisting[caption=keisan02.c,style=c]{./src-c/keisan02.c}
+
+\subsection{確認}
+このプログラムはwhileループ部で分岐が発生するので、不正な数値が入力されたときに正しくループをするかの確認が必要である。以下の実行例から、正しく実行できていることが確認できる。このプログラムは設問条件(2a)-(2c)を満たしている。
+\begin{verbatim}
+  $ cc -std=c89 keisan02.c
+  $ ./a.out
+  input an interger number(a): 3
+  input an interger number(b): 12
+  Invalid value. Retype an integer in range 2-9.
+  input an interger number(b): 1
+  Invalid value. Retype an integer in range 2-9.
+  input an interger number(b): 10
+  Invalid value. Retype an integer in range 2-9.
+  input an interger number(b): 2
+  input an interger number(c): 0
+  Invalid value. Retype an integer in range 2-9.
+  input an interger number(c): a
+  Invalid value. Retype an integer in range 2-9.
+  input an interger number(c): 9
+  value (a) is 3
+  value (b) is 2
+  value (c) is 9
+\end{verbatim}
+
+\subsection{難しかった点など}
+配列の宣言時にJavaの配列の宣言の書式で書いてしまうミスをした程度で、それ以外は特になかった。
+
+\section{設問(3)}
+\subsection{課題内容と方針}
+本課題の要件は、定義された関数myrandを用いて式(A)の範囲の乱数を生成し、nに代入すること、nを用いて式(A)を表示すること、これまで通りa, b, cを標準入力から得ること、入力されたa, b, cを用いて式(A)が成り立つか判定すること、である。
+
+次に方針を考える。まずmyrand(n)は1以上n以下の数を出力する関数であるが、まだ取り回しが不便である。より扱いやすい関数として関数内にシード値の初期化機能を持ち、乱数の最小値と最大値を指定できる新しい関数randint(a,b)を定義しよう。これはa以上b以下の乱数を生成する関数であり、myrandを引数に注意して平行移動する形で実装する。残りの部分はmain関数に順次実装する。nを用いた式の表示はprintfで行い、a, b, cを用いた式の判定はif-elseで行う。
+
+\subsection{実装}
+以下に実装例を提示する。26行目から新しい関数randintを定義している。まずシード値の初期化を行い、次の分岐は0割りの除外である\footnote{もっとも、0割りが発生する呼び出しが起こったとすれば、それは乱数を生成する状況でないので無意味であるが。}0割りが起こらないことが確認できたら、引数に注意してmyrandを平行移動している。乱数を生成する関数はデバッグが難しいのでここで論理的に正しいのかを確認しよう。まず、myrandが最小値を取るとすると、myrandから1が返る。よって全体の返り値はaとなり正しい。次にmyrandが最大値を取ると仮定する。そのとき、myrandからはb-a+1が返り、全体の返り値はbとなる。よってintrandはa以上b以下の値を返すことが確認できる。
+
+この関数を用いてmainを実装する。まず式(A)の値域を考える。最小値は$a=b=c=2$のとき6、最大値は$a=b=c=9$のとき90である。よってnにはこの範囲の乱数をrandintで与える。
+次にprintfで式(A)を表示している。nの部分はフォーマットで値を挿入している。その後の標準入力はこれまで通りである。最後にif-elseで式が成り立つか判定して、それに応じたメッセージgood!/bad!を表示している。
+\lstinputlisting[caption=keisan03.c,style=c]{./src-c/keisan03.c}
+
+\subsection{確認}
+randintの正当性はすでに確認したので、あとはmainにおけるifの分岐が正しく実行できることを確認すればよい。
+以下の実行結果から、ifが正しく機能していることと、乱数と思われる数が生成されていることが確認できる。よって設問要件を満たしている。
+\begin{verbatim}
+  $ cc -std=c89 keisan03.c
+  $ ./a.out
+  a * b + c = 39
+  input an interger number(a): 6
+  input an interger number(b): 6
+  input an interger number(c): 3
+  good!
+  $ ./a.out
+  a * b + c = 48
+  input an interger number(a): 4
+  input an interger number(b): 4
+  input an interger number(c): 4
+  bad!
+  $ ./a.out
+  a * b + c = 29
+  input an interger number(a): 5
+  input an interger number(b): 5
+  input an interger number(c): 4
+  good!
+\end{verbatim}
+
+\subsection{難しかった点など}
+//でコメントを書いたら、C++タイプのコメントはC89では使えないとコンパイラに怒られ、やるせない気持ちで修正したという事案が発生した程度である。なお、コード挿入に利用しているlistingsパッケージでは日本語のコメントはうまく表示できないようなのでコメントはレポートに挿入する時点で削除した。
+
+\section{設問(4)}
+\subsection{課題内容と方針}
+本課題は全問のプログラムを改造して、最後の式判定の際に成り立つ答えが得られるまで繰り返すという内容である。
+
+方針としては入力、判定の部分をwhile(1)でループさせて式判定でgood!を出力後にbreakする。また、本設問には直接関係ないが、ここまでの処理をplay()という関数にまとめて取り回しやすくする。
+
+\subsection{実装}
+以下に実装例を提示する。まず、ここまでmainに書かれてきた処理内容はすべて33行目からのplay関数に移した。そのコードに対し、38から49行目のwhileループを追加し、if文のthen部にbreakを書いた。main関数ではplay関数を呼び出して終了である。
+\lstinputlisting[caption=keisan04.c,style=c]{./src-c/keisan04.c}
+
+\subsection{確認}
+誤答をしたときに繰り返しをして、正答で即座に終了することを確認すればよい。以下の実行結果は要件に合致する。
+\begin{verbatim}
+  $ cc -std=c89 keisan04.c
+  $ ./a.out
+  a * b + c = 12
+  input an interger number(a): 2
+  input an interger number(b): 4
+  input an interger number(c): 4
+  good!
+  $ ./a.out
+  a * b + c = 47
+  input an interger number(a): 3
+  input an interger number(b): 3
+  input an interger number(c): 3
+  bad!
+  input an interger number(a): 4
+  input an interger number(b): 4
+  input an interger number(c): 4
+  bad!
+  input an interger number(a): 5
+  input an interger number(b): 5
+  input an interger number(c): 5
+  bad!
+  input an interger number(a): 5
+  input an interger number(b): 9
+  input an interger number(c): 4
+  bad!
+  input an interger number(a): 5
+  input an interger number(b): 8
+  input an interger number(c): 7
+  good!
+\end{verbatim}
+
+\subsection{難しかった点など}
+特になかった。
+
+\section{設問(5)}
+\subsection{課題内容と方針}
+本課題の要件は、今までは式(A)を対象にしていたが、式(B)を対象にしたプログラムを作成することである。
+
+方針としては、全問のplayをまず複製してplay\_Bとする。それに伴い、playはplay\_Aとする。そして、式に依存している部分として、nの範囲と式のprintf, 正誤判定の式を変更する。
+
+\subsection{実装}
+以下に実装例を提示する。変更したのは60行目のnの値の範囲、61行目のprintf、70行目の条件式である。まず、60行目のnの値の範囲を考える。最小値は問題文から0である。最大値は$a=b=9, c=2$のとき79である。これをrandintの引数とする。次に61行目のprintfは文字列を置き換えるだけであり、70行目の条件式も式を置き換えるだけである。main関数では今度はplay\_B関数を呼び出して終了である
+\lstinputlisting[caption=keisan05.c,style=c]{./src-c/keisan05.c}
+
+\subsection{確認}
+変更した部分について特に確認すればよい。まず61行目のprintfの結果でnの値の範囲と書き換えた式を確認できる。あとはif文での正誤判定が妥当かを確認すればよい。以下の実行結果から要件を満たしていることが確認できる。
+\begin{verbatim}
+  $ cc -std=c89 keisan05.c
+  $ ./a.out
+  a * b - c = 30
+  input an interger number(a): a
+  Invalid value. Retype an integer in range 2-9.
+  input an interger number(a): 6
+  input an interger number(b): 6
+  input an interger number(c): 6
+  good!
+  $ ./a.out
+  a * b - c = 27
+input an interger number(a): 4
+input an interger number(b): 4
+input an interger number(c): 4
+bad!
+input an interger number(a): 5
+input an interger number(b): 5
+input an interger number(c): 5
+bad!
+input an interger number(a): 5
+input an interger number(b): 5
+input an interger number(c): 6
+bad!
+input an interger number(a): 5
+input an interger number(b): 6
+input an interger number(c): 3
+good!
+\end{verbatim}
+\subsection{難しかった点など}
+特になかった。
+
+\section{設問(6)}
+\subsection{課題内容と方針}
+課題の要件は乱数により、式(A)か式(B)かを決定して動作することと、絶対に正答が得られないnの値が出たときには求め直すことである。
+
+方針としては、まず、main関数はrandint(0,1)で式を選ぶ乱数を出し、if-elseでplay\_Aかplay\_Bを走らせる。
+play\_Aとplay\_B内のnの値を決めるプロセスではdo-whileで例外値が該当しなくなるまで乱数生成を繰り返す。ここで、ループで短期間に繰り返し乱数seedをリセットする可能性がある場合、1秒待たないと同じ数値が生成され続ける可能性に気づいたのでここでコードを変更する。\footnote{あまりないと思うが、念のため。これまでは呼び出し間隔が1秒以上開く状況であったため、この問題が発生する可能性は低い。}
+
+\subsection{実装}
+以下に実装例を提示する。まず、play\_Aとplay\_B関数は、do-whileでnの値が例外に該当する間は乱数生成をやり直し続けるようにした。do-whileを使うのは、一度は必ず実行が必要だからである。randint関数からはsrandを削除した。これはmain関数内で一度だけ呼び出されるように変更する。main関数では、まず、どちらの式を使うのかの値を入れる変数rand\_expressionを宣言する。そして、srandで乱数のseed値を初期化してから、乱数として0または1を代入している。あとは、rand\_expressionの値に応じてplay\_Aまたはplay\_Bを呼び出す。
+\lstinputlisting[caption=keisan06.c,style=c]{./src-c/keisan06.c}
+
+\subsection{確認}
+ここで特に確認すべきことは、両方の式がランダムに登場するかどうかである。以下では中断を繰り返して両方の値が登場するか確認している。また、どちらの式が与えられても正しく動作することが確認できる。確率的に低いので例外の数値が出ないかは確認しにくいが、より例外が発生しやすい状況でdo-whileのテストコードを書いて確かに例外の数値が出ないことを確かめたので実装としては問題ない。
+\begin{verbatim}
+  $ cc -std=c89 keisan06.c
+  $ ./a.out
+  a * b - c = 72
+  input an interger number(a): ^C
+  $ ./a.out
+  a * b - c = 65
+  input an interger number(a): ^C
+  $ ./a.out
+  a * b - c = 33
+  input an interger number(a): ^C
+  $ ./a.out
+  a * b + c = 45
+  input an interger number(a): ^C
+  $ ./a.out
+  a * b + c = 29
+  input an interger number(a): ^C
+  $ ./a.out
+  a * b - c = 17
+  input an interger number(a): 4
+  input an interger number(b): 5
+  input an interger number(c): 3
+  good!
+  $ ./a.out
+  a * b + c = 33
+  input an interger number(a): 9
+  input an interger number(b): 3
+  input an interger number(c): 6
+  good!
+\end{verbatim}
+
+\subsection{難しかった点など}
+前のコードを改造する中でコピーした部分を1行だけ消し忘れてデバッグに手間取った。
+
+\section{設問(7)}
+\subsection{課題内容と方針}
+最後の課題の要件はコマンドライン変数を1つ取り、その回数だけ繰り返す、ただし、コマンドライン変数が1つでない場合は終了することである。
+
+方針としては、まずargcでコマンドライン変数の長さを確認して、argcが2でなければ終了する。なぜなら、コマンドライン引数の0番目argv[0]にはプログラム名を表す文字列など\footnote{「など」と書いたのは、稀なケースだが、処理系や状況によっては異なることがあるからである}ユーザーが与えるコマンドライン引数とは別のものが入るからである。argcが2のときはatoi関数で文字列引数をintに変換する。あとは、前問で書いた処理をfor文で規定回数実行するだけである。
+
+\subsection{実装}
+以下に実装例を提示する。今回の実装はmain関数だけである。前問までとは異なり、mainには2つ引数を取る。本文ではまず変数を宣言したあと、まずargcの大きさを確認して、コマンドライン引数が1つであることを確認する。ここでコマンドライン変数が1つでなかった場合はわかりやすいようにメッセージを表示して、return 1で終了する。return 1は、多くの場合、異常終了として扱われている。コマンドライン変数が1つのときは次に進む。次は、コマンドライン引数が入っているargv[1]を数値に変換して変数repに格納する。次に処理はおまけであり、repが0のときもわかりやすくメッセージを残して異常終了する。この部分はなくてもメッセージが出ないだけの違いしかない。最後にfor文で前問までの処理をrepの大きさだけ回している。
+\lstinputlisting[caption=keisan07.c,style=c]{./src-c/keisan07.c}
+
+\subsection{確認}
+確認すべき部分は引数が不正な場合、ちゃんと終了するか、ということと、適切な引数を与えた場合、要求された回数の処理が回るかである。実行結果から、正しく処理できていることが確認できる。
+\begin{verbatim}
+  $ cc -std=c89 keisan07.c
+  $ ./a.out
+  Invalid argment(s)!
+  $ ./a.out 1 3 4
+  Invalid argment(s)!
+  $ ./a.out 4
+  a * b - c = 67
+  input an interger number(a): 8
+  input an interger number(b): 9
+  input an interger number(c): 5
+  good!
+  a * b + c = 75
+  input an interger number(a): 8
+  input an interger number(b): 9
+  input an interger number(c): 3
+  good!
+  a * b + c = 18
+  input an interger number(a): 3
+  input an interger number(b): 5
+  input an interger number(c): 3
+  good!
+  a * b - c = 67
+  input an interger number(a): 8
+  input an interger number(b): 9
+  input an interger number(c): 5
+  good!
+\end{verbatim}
+
+\subsection{難しかった点など}
+C89ではfor文の内部で変数を宣言できないとコンパイラに怒られたが、それ以外は特になかった。
+
+\section{感想}
+私はC言語はPythonほどは使えないが、全く経験が無いわけではなかったので今回の内容にそれほど苦労はなかった。それゆえ、特に記述するべき参考文献はない(よって参考文献リストがないのは不備ではない)。昔はC系の言語はエラーをたくさん出しながら書いていた記憶があるが、今回はあまりエラーがなかったので多少の成長を感じられた。どちらかというと、C89に起因するコンパイルエラーが多くそのたびにやるせない気持ちになったが、C89は私が小学生の頃に読んだ入門書より古い内容であるから、手になじまないのも仕方ないかもしれない。
+
+しかし、私の友人の一言で考えが変わった。曰く、「C89の頃のCはアセンブリとコードが逐次翻訳の域を出ていなかった」と。なるほど、古いとはいえ、アセンブリに比べれば大分マシな代物である。四則演算も勝手にやってくれるし、関数の引数も勝手にスタックに積んでくれる。あえてC89を学習する意味があるのかはわからないが、アセンブリを学習するのと同列の意味合いなのかもしれない。
 \end{document}
