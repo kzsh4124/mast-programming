@@ -68,7 +68,11 @@ basewidth={0.57em,0.52em},
 
 \section{設問(1)}
 \subsection{問題概要と方針}
+標準入力でファイルを受け取り、cat -n風のプログラムを作成する問題である。方針としては、fgetsの返り値を利用して、ファイルの中身をすべて入力し、strcpy関数でコピーしてフォーマット通りに出力すればよい。
 
+\subsection{実装}
+以下に実装を提示する。
+\lstinputlisting[caption=keisan01.c,style=c]{./src-c/s2111609-1.c}
 
 
 

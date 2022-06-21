@@ -18,8 +18,8 @@ int main(void){
     for(i=0; i<line_counter; i++){
         strcpy(file[i], s[i]);
     }
-    for(j=0; j<line_counter; j++){
-        printf("%5d %s", j+1, file[j]);
+    for(i=0; i<line_counter; i++){
+        printf("%5d %s", i+1, file[i]);
 
     }
 }
