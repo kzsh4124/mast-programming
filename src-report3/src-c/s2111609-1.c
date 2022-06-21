@@ -7,7 +7,7 @@
 int main(void){
     char s[LSIZE][BSIZE];
     char file[LSIZE][BSIZE];
-    int i,j;
+    int i;
     int line_counter = 0;
 
     while(fgets(s[i],BSIZE,stdin) != NULL){
