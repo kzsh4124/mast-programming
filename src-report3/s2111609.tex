@@ -1,0 +1,75 @@
+\RequirePackage{plautopatch}
+% 一応pLaTeX用パッチを当てておく
+% クラスオプションでdvipdfmxを読み込めばusepackageで個別に指定する必要がなくなる
+% jarticleは非推奨なので使いたくないが、レギュレーションなので大変遺憾に思いつつ従う
+\documentclass[dvipdfmx,12pt,a4j]{jarticle}
+% dvipdfmxはグローバルオプションとして読み込んでいるので個別のパッケージのオプションとしては不要
+\usepackage{graphicx}
+\usepackage{amsmath,amsbsy}
+% ロゴ関係
+\usepackage{bxtexlogo}
+\bxtexlogoimport{*,**}
+% Hオプションを使いたいので読み込む
+\usepackage{here}
+% ソースコードを表示するのに読み込む
+\usepackage{listings}
+% シンタックスハイライトのため
+\usepackage{xcolor}
+% url挿入のため
+\usepackage{url}
+% xcolorの色定義
+\definecolor{solarized@base03}{HTML}{002B36}
+\definecolor{solarized@base02}{HTML}{073642}
+\definecolor{solarized@base01}{HTML}{586e75}
+\definecolor{solarized@base00}{HTML}{657b83}
+\definecolor{solarized@base0}{HTML}{839496}
+\definecolor{solarized@base1}{HTML}{93a1a1}
+\definecolor{solarized@base2}{HTML}{EEE8D5}
+\definecolor{solarized@base3}{HTML}{FDF6E3}
+\definecolor{solarized@yellow}{HTML}{B58900}
+\definecolor{solarized@orange}{HTML}{CB4B16}
+\definecolor{solarized@red}{HTML}{DC322F}
+\definecolor{solarized@magenta}{HTML}{D33682}
+\definecolor{solarized@violet}{HTML}{6C71C4}
+\definecolor{solarized@blue}{HTML}{268BD2}
+\definecolor{solarized@cyan}{HTML}{2AA198}
+\definecolor{solarized@green}{HTML}{859900}
+% listingsのスタイル定義
+\lstdefinestyle{c}{
+  language=c,
+  numbers=left,
+}
+\lstset{
+basicstyle=\small\ttfamily\color{solarized@base00},
+rulesepcolor=\color{solarized@base03},
+numberstyle=\scriptsize\color{solarized@base01},
+keywordstyle=\color{solarized@blue},
+stringstyle=\color{solarized@cyan}\ttfamily,
+commentstyle=\color{solarized@base01},
+emphstyle=\color{solarized@red},
+backgroundcolor=\color{solarized@base3},
+sensitive=true,
+breaklines=true,
+breakatwhitespace=true,
+framerule=0pt,
+frame=l,
+showstringspaces=false,
+tabsize=2,
+basewidth={0.57em,0.52em},
+}
+\title{プログラミング　第2回レポート}
+\author{202111609　仲村和士}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{はじめに}
+今回はポインタを中心とした問題群である。C言語は、多少のミスがSegmentation faultにつながるのでデバッグが難しい言語であることが実感できる回であったと思う。それでは早速はじめて行こう。
+
+\section{設問(1)}
+\subsection{問題概要と方針}
+
+
+
+
+\end{document}

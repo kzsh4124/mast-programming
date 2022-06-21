@@ -1,0 +1,15 @@
+This is the example file for the test.
+Use this by redirecting to stdin.
+Keep 5 digits for line numbers.
+A line has 100 characters(max).
+A file has 10000 lines(max).
+Use copy function.
+Line 7
+hogehoge
+piyopiyo
+fugafuga
+kinoko
+Line 12
+Line 13
+Line 14
+Line 15
