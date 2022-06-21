@@ -44,7 +44,7 @@ int main(int argc, char** argv){
         i++;
         line_counter++;
     }
-        /*Make a perfectly fited 2-dimension dinamic array */
+    /*Make a perfectly fited 2-dimension dinamic array */
     file = (char**) malloc(sizeof(char*)*line_counter);
     if(file == NULL){
         puts("memory allocation failure");
