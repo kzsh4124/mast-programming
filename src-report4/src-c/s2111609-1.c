@@ -12,7 +12,7 @@ struct LIST {
 struct Element *h;
 struct Element *t;
 };
-
+/* create new element (value: int n)*/
 struct Element *getElement(int n){
 struct Element *p;
 
@@ -42,6 +42,7 @@ l->t = l->h;
 return l;
 }
 
+/* add new element */
 void appendElement(struct LIST *l, int n){
 struct Element *e;
 
