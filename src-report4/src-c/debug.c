@@ -58,9 +58,9 @@ void appendElement(struct LIST *l, int n){
 void insert(struct LIST *l, struct Element *v, struct Element *p){
     /* when p->next is NULL, NULL->prev causes Segmentation Error! */
     if(p->next != NULL){
+        v->next = p->next;
         p->next->prev = v;
     }
-    v->next = p->next;
     p->next = v;
     v->prev = p;
     /* update tail element */
@@ -119,13 +119,12 @@ int main(int ac, char* av[]){
     while(1){
         printf("input a number (quit when 0): ");
         i = getint();
-        if (i == 0){
-            break;
-        }
         appendElement(list1, i);
         insertElement(list2, i);
+        if(i==0){
+            break;
+        }
     }
-
     printAllElements(list1);
     puts("sorted");
     printAllElements(list2);

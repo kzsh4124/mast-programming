@@ -1,0 +1,210 @@
+\RequirePackage{plautopatch}
+% 一応pLaTeX用パッチを当てておく
+% クラスオプションでdvipdfmxを読み込めばusepackageで個別に指定する必要がなくなる
+% jarticleは非推奨なので使いたくないが、レギュレーションなので大変遺憾に思いつつ従う
+\documentclass[dvipdfmx,12pt,a4j]{jarticle}
+% dvipdfmxはグローバルオプションとして読み込んでいるので個別のパッケージのオプションとしては不要
+\usepackage{graphicx}
+\usepackage{amsmath,amsbsy}
+% ロゴ関係
+\usepackage{bxtexlogo}
+\bxtexlogoimport{*,**}
+% Hオプションを使いたいので読み込む
+\usepackage{here}
+% ソースコードを表示するのに読み込む
+\usepackage{listings}
+% シンタックスハイライトのため
+\usepackage{xcolor}
+% url挿入のため
+\usepackage{url}
+% 枠のため
+\usepackage{ascmac}
+% xcolorの色定義
+\definecolor{solarized@base03}{HTML}{002B36}
+\definecolor{solarized@base02}{HTML}{073642}
+\definecolor{solarized@base01}{HTML}{586e75}
+\definecolor{solarized@base00}{HTML}{657b83}
+\definecolor{solarized@base0}{HTML}{839496}
+\definecolor{solarized@base1}{HTML}{93a1a1}
+\definecolor{solarized@base2}{HTML}{EEE8D5}
+\definecolor{solarized@base3}{HTML}{FDF6E3}
+\definecolor{solarized@yellow}{HTML}{B58900}
+\definecolor{solarized@orange}{HTML}{CB4B16}
+\definecolor{solarized@red}{HTML}{DC322F}
+\definecolor{solarized@magenta}{HTML}{D33682}
+\definecolor{solarized@violet}{HTML}{6C71C4}
+\definecolor{solarized@blue}{HTML}{268BD2}
+\definecolor{solarized@cyan}{HTML}{2AA198}
+\definecolor{solarized@green}{HTML}{859900}
+% listingsのスタイル定義
+\lstdefinestyle{c}{
+  language=c,
+  numbers=left,
+}
+\lstset{
+basicstyle=\small\ttfamily\color{solarized@base00},
+rulesepcolor=\color{solarized@base03},
+numberstyle=\scriptsize\color{solarized@base01},
+keywordstyle=\color{solarized@blue},
+stringstyle=\color{solarized@cyan}\ttfamily,
+commentstyle=\color{solarized@base01},
+emphstyle=\color{solarized@red},
+backgroundcolor=\color{solarized@base3},
+sensitive=true,
+breaklines=true,
+breakatwhitespace=true,
+framerule=0pt,
+frame=l,
+showstringspaces=false,
+tabsize=2,
+basewidth={0.57em,0.52em},
+}
+\title{プログラミング　第4回レポート}
+\author{202111609　仲村和士}
+\date{\today}
+\begin{document}
+\maketitle
+\section{はじめに}
+今回は連結リストのデータ構造に関する問題である。連結リストは個人的にはJavaのCollectionとして実装されているものが一番最初に浮かぶが、実際に実装してみると、オブジェクト指向ではないC言語ではJavaに比べて少々扱いにくい印象であった。今回は授業資料のほかに、C++で解説された書籍~\cite{algorithm} で全体的な知識を得た。日本語の書誌情報を含むのでpbibtexを推奨する。
+
+\section{設問(1)}
+\subsection{課題内容と方針}
+双方向連結リストを扱いやすい関数にまとめるほか、末尾から辿って出力する関数を作る問題である。
+
+方針としては、講義ノート(14)の図9より図11のほうが作成したい体裁に近いことから、図11を双方向リストに修正する方向で実装する。修正する部分は図9の解説を読めば十分である。
+
+\subsection{実装}
+図11に対する変更点を簡単に説明する。
+まず8行目で前のElementへの参照を持つように変更している。
+次に、27行目ではnext同様に初期化している。53行目ではappendする際に戻り方向の参照も設定するようにしている。
+
+66行目からのrprintAllElement関数では、最後の要素l-\verb+>+tから逆順にhにたどり着くまで要素の値を出力している。
+mainでは最後にこの関数を呼んでいる。
+
+\lstinputlisting[caption=s2111609-1.c,style=c]{./src-c/s2111609-1.c}
+
+\subsection{確認}
+この設問の要求は、双方向連結リストの関数化、rprintAllElements関数の実装、標準入力の値をリストに入れて出力することである。
+もともと単方向のリストが実装されていたので、rprintAllElements関数で正しく逆順に辿れていることが確認できればよい。また、要素数が0のコーナーケース(となりうる状況)も一応確認する。以下の実行例から、正しく実装されていることが確認できる。
+
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc s2111609-1.c
+  $ ./a.out
+  input a number (quit when 0): 1
+  input a number (quit when 0): 4
+  input a number (quit when 0): 8
+  input a number (quit when 0): 5
+  input a number (quit when 0): 1
+  input a number (quit when 0): 67
+  input a number (quit when 0): 356
+  input a number (quit when 0): 0
+  val = 1
+  val = 4
+  val = 8
+  val = 5
+  val = 1
+  val = 67
+  val = 356
+  reverse
+  val = 356
+  val = 67
+  val = 1
+  val = 5
+  val = 8
+  val = 4
+  val = 1
+  $ ./a.out 
+  input a number (quit when 0):  0
+  reverse
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+LinkedList自体がそれなりに難しいとは思うが、事前にしっかり理解してから注意深く実装したので問題なかった。
+
+\section{設問(2)}
+\subsection{課題内容と方針}
+受け取った入力を昇順になるように挿入するinsertElement関数を作る課題である。
+
+方針としては、関数を分割する。すなわち、特定のElementのあとにElementを挿入する(ポインタを繋ぎ変える)関数を別に作っておき、挿入する場所を探して挿入する。挿入する場所を探す際、それまでのノードはすでに昇順になっているという条件を用いれば、前から順番にリストの要素と挿入する要素の値を比較すればよい。
+
+\subsection{実装}
+前問との変更点は57行目からのinsert関数とinsertElement関数を追加した点である。insert関数は引数に2つのElementのポインタp, vをとり、pのあとにvを挿入する関数である。ここでは、pが末尾の要素の場合にp-\verb+>+nextがNULLになることに注意する。60行目のifではNULL値の場合に61行目が問題になるのでそれを場合分けしている。67行目のifではpが末尾の要素であったときにvを末尾に更新する処理である。
+
+insertElement関数では、新しい要素を挿入するべき場所をループで探してinsert関数を用いて挿入する。hを起点として順番に探して行く構造である。79行目からの判定について説明すると、最初のifでは、今見ている要素seekの次の要素がNULLであるときにはseekは末尾の要素であるから、最後に挿入する。else ifでは次の要素の値が、挿入する値よりも大きければ、現在見ているseek要素の次に挿入する。これらの挿入処理はappendする関数とinsert関数で分けることもできるが、tの更新処理まで行っているinsertが万能なので結局同じように書ける。\footnote{orで繋いで一つのifで書くこともできるが、内容は同じなので好みの問題だろう。}
+それ以外のときにはまだ挿入する場所が見つかっていないのでseekを次の要素にする。これを繰り返して正しい場所に挿入する。
+
+main関数ではそのままappendしていくlist1と昇順になっているlist2を用意して比較できるようにした。
+
+
+\lstinputlisting[caption=s2111609-2.c,style=c]{./src-c/s2111609-2.c}
+
+\subsection{確認}
+重複要素や負数を含んだ入力に対して正しく対応できればよい。また、処理冒頭で要素数が0のときが必ずあるのであえて分けて検証する必要はあまりない。
+
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc s2111609-2.c -std=c89
+  $ ./a.out
+  input a number (quit when 0): -5
+  input a number (quit when 0): -100
+  input a number (quit when 0): -10
+  input a number (quit when 0): -5
+  input a number (quit when 0): 7
+  input a number (quit when 0): -3
+  input a number (quit when 0): 100
+  input a number (quit when 0): 7
+  input a number (quit when 0): 0
+  val = -5
+  val = -100
+  val = -10
+  val = -5
+  val = 7
+  val = -3
+  val = 100
+  val = 7
+  sorted
+  val = -100
+  val = -10
+  val = -5
+  val = -5
+  val = -3
+  val = 7
+  val = 7
+  val = 100
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+当初、NULL値の場合分けに気づかず、Segmentation faultを起こしたが、割とすぐに発見できた。
+
+
+\section{設問(3)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\bibliographystyle{junsrt}
+\bibliography{cite}
+\end{document}

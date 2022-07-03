@@ -13,7 +13,7 @@ struct LIST {
     struct Element *h;
     struct Element *t;
 };
-/* create new element (value: int n)*/
+/* create new element (value: char* s)*/
 struct Element *getElement(char* s){
     struct Element *p;
 
@@ -73,8 +73,7 @@ char* chomp(char* s){
     }
 }
 
-char* get_line(void){
-    char buf[BUFSIZE];
+char* get_line(char* buf){
     if(fgets(buf, BUFSIZE, stdin) != NULL){
         chomp(buf);
         return buf;
@@ -86,13 +85,15 @@ char* get_line(void){
 int main(int ac, char* av[]){
     struct LIST *list;
     int i;
-    char* buf, line;
+    char buf[BUFSIZE];
+    char* line;
 
-    list1 = initList();
+    list = initList();
     while(1){
-        buf = get_line();
-        if(buf == NULL){
+        if(fgets(buf, BUFSIZE, stdin) == NULL){
             break;
+        }else{
+            chomp(buf);
         }
         line = (char*) malloc(strlen(buf)+1);
         if(line == NULL){

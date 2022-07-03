@@ -91,6 +91,7 @@ int main(int ac, char* av[]){
     }
 
     printAllElements(list);
+    puts("reverse");
     rprintAllElements(list);
 
 
