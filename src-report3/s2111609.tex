@@ -17,6 +17,8 @@
 \usepackage{xcolor}
 % url挿入のため
 \usepackage{url}
+% 枠のため
+\usepackage{ascmac}
 % xcolorの色定義
 \definecolor{solarized@base03}{HTML}{002B36}
 \definecolor{solarized@base02}{HTML}{073642}
@@ -57,14 +59,14 @@ showstringspaces=false,
 tabsize=2,
 basewidth={0.57em,0.52em},
 }
-\title{プログラミング　第2回レポート}
+\title{プログラミング　第3回レポート}
 \author{202111609　仲村和士}
 \date{\today}
 \begin{document}
 \maketitle
 
 \section{はじめに}
-今回はポインタを中心とした問題群である。C言語は、多少のミスがSegmentation faultにつながるのでデバッグが難しい言語であることが実感できる回であったと思う。それでは早速はじめて行こう。
+今回はポインタを中心とした問題群である。個人的には、C言語は、多少のミスがSegmentation faultにつながるのでデバッグが難しい言語であることが実感できる回であったと思う。それでは早速はじめて行こう。
 
 \section{設問(1)}
 \subsection{問題概要と方針}
@@ -72,8 +74,151 @@ basewidth={0.57em,0.52em},
 
 \subsection{実装}
 以下に実装を提示する。
-\lstinputlisting[caption=keisan01.c,style=c]{./src-c/s2111609-1.c}
+4, 5行目でファイルの1行の文字列の長さ、および、ファイルの行数をマクロ定義してる。
+main関数では、まず変数定義をする。変数を簡単に説明すると、sはバッファ、fileはバッファの内容をコピーして使う本番ファイルでそれぞれcharの2重配列、iはループ変数、line\_counterは行数のカウンタである。ファイルの標準入力を行い、line\_counterという変数によりそこでわかったファイルの長さ分だけstrcpyでコピーとprintfによる出力のループをそれぞれ回している。
+\lstinputlisting[caption=s2111609-1.c,style=c]{./src-c/s2111609-1.c}
 
+\subsection{確認}
+設問条件について確認しよう。
+\begin{enumerate}
+  \item 標準入力で複数行の文字列を受け取る。
+  \item 受け取った文字列はバッファ配列に一時的に格納し、本配列にコピーする。
+  \item 配列サイズはマクロ定義する。
+  \item 行番号を右詰め5桁で付けて出力する。ただし、行番号と本文の間には半角空白を一つ入れる。
+\end{enumerate}
+上のプログラムはこれらを満たすように作られている。
+以下に実行例を提示する。testerはtest用のファイルであり、リダイレクトを用いて標準入力として与えられる。
+また、行番号を5桁右詰めにする部分はレポート上だと、整形される影響でわかりにくいが、実際に実行すると設問条件の通りになることに留意されたい。
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc -std=c89 s2111609-1.c 
+  $ ./a.out < tester
+    1 This is the example file for the test.
+    2 Use this by redirecting to stdin.
+    3 Keep 5 digits for line numbers.
+    4 A line has 100 characters(max).
+    5 A file has 10000 lines(max).
+    6 Use copy function.
+    7 Line 7
+    8 hogehoge
+    9 piyopiyo
+   10 fugafuga
+   11 kinoko
+   12 Line 12
+   13 Line 13
+   14 Line 14
+   15 Line 15
 
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+入力回数がファイル依存の標準入力は競技プログラミングなどでもほとんどみられないため、少々慣れない実装であったと思う。ファイルが最終行に到達したときにfgetsがNULL値を返すことは理解していたのでそれで判定できることをテストプログラムで検証してから本実装をした。
+
+\section{設問(2)}
+\subsection{課題内容と方針}
+取得した文字列を動的に確保したメモリに格納するように改造する課題である。前設問で配列を2次元配列を2つ宣言しているため、この設問内容だけだと解釈の仕方がたくさんあると思われる。私は(設問趣旨をはかりかねたので)大は小を兼ねるということで4箇所すべて動的に確保することにした。\footnote{しかし、実際のところ、ファイルを受け取る前にサイズを判断するのは難しいため、あえてバッファの配列を動的に確保したメモリに格納する意味はないと思われる。}
+
+方針としては、mallocを用いて必要なだけメモリを確保する。特に、本番ファイルの方ではサイズがわかっているので最小限のメモリのみを確保する。
+
+\subsection{実装}
+以下に実装を提示する。変更点を見ていこう。まず、charの2重配列だった部分はcharのダブルポインタに変更した。
+これは動的なメモリ確保のためである。また、変数sはわかりやすいようにbuffという名前に変更した。次に、14行目からはbuffに対して動的にメモリを確保している。mallocを用いる際には、メモリ確保に失敗したときにNULLを返すのでそれを確認して強制終了させることを忘れないように注意する。\footnote{ほかの言語に慣れていると、こういうときは例外を投げてほしいという気分になるのは私だけではないはず...}
+
+34行目からのコピーを行う部分では、入力サイズに合わせた動的なメモリ確保を行っている。fileで確保するべき大きさは、入力行数であり、file[i]で確保すべき大きさはstrlen関数で求めた長さにヌル文字分として1足したものになる。
+
+53行目からの部分ではfree関数でメモリを解放し、メモリリーク対策をしている。\footnote{プログラムが終了したら解放されるようにできていることも多いらしいが、組み込み系では深刻な問題になりうる。}
+\lstinputlisting[caption=s2111609-2.c,style=c]{./src-c/s2111609-2.c}
+
+\subsection{確認}
+この設問では動的なメモリ確保をすればよい。どの程度変更するべきかは解釈によるだろうが、すべて変更したので設問条件は確実に満たしている。注意事項はおそらくメモリ確保失敗時の例外処理だろうと思われるが、それも対応している。以下は実行例である。内部的な実装を変更しただけなので出力は特に変わらない。
+
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc -std=c89 s2111609-2.c
+  $ ./a.out < tester
+    1 This is the example file for the test.
+    2 Use this by redirecting to stdin.
+    3 Keep 5 digits for line numbers.
+    4 A line has 100 characters(max).
+    5 A file has 10000 lines(max).
+    6 Use copy function.
+    7 Line 7
+    8 hogehoge
+    9 piyopiyo
+   10 fugafuga
+   11 kinoko
+   12 Line 12
+   13 Line 13
+   14 Line 14
+   15 Line 15
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+単純なミスでSegmentation faultが発生したが、手がかりが何もないのでデバッグが大変であった。
+
+\section{設問(3)}
+\subsection{課題内容と方針}
+コマンドライン引数を取っていたら第1引数を用いて検索し、それを含む行をすべて表示、コマンドライン引数がなければ前問までと同様の出力をするという処理を関数に分けて作るという課題である。コマンドライン引数がある場合の行番号の振り方は解釈が複数あるが、grep -n風の出力が得られるものと解釈して話を進める。
+
+文字列中の検索にはstrstr関数を用いれば良い。あとは、argcで適切に場合分けすればよい。
+
+\subsection{実装}
+実装を提示する。
+作成したのはoutput\_plain関数とoutput\_grep関数である。前者は引数を取ってはいるものの、中身は前問までの処理を仮引数に直してそのまま移植しただけなので特に説明することはない。
+
+後者を説明する。strstr関数は文字列中に与えられた文字列を含むかを調べる関数であり、含まれないときにNULLを返す。今回はNULLかどうかだけを判定すれば十分である。そのため、NULLでないときのみ出力するようなif文を組んでいる。
+
+main関数では、62行目以降、argcの値から、コマンドライン引数の有無を確認してどちらのoutput関数を走らせるか判定し、コマンドライン引数があるときにはargv[1]を探索する文字列として渡すようにしている。
+
+\lstinputlisting[caption=s2111609-3.c,style=c]{./src-c/s2111609-3.c}
+
+\subsection{確認}
+設問条件を確認しよう。
+
+コマンドライン変数がないときには、読み込んだ文字列を格納する配列、その要素数を引数にとり、前問までと同様の処理を行う関数を走らせる。
+
+コマンドライン引数があるときには、それに加えて検索する文字列の計3引数をとり、grep風の結果を出力する関数を走らせる。
+
+これらをどちらも満たしていることは実行例から確認できる。
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc -std=c89 s2111609-3.c
+  $ ./a.out < tester
+    1 This is the example file for the test.
+    2 Use this by redirecting to stdin.
+    3 Keep 5 digits for line numbers.
+    4 A line has 100 characters(max).
+    5 A file has 10000 lines(max).
+    6 Use copy function.
+    7 Line 7
+    8 hogehoge
+    9 piyopiyo
+   10 fugafuga
+   11 kinoko
+   12 Line 12
+   13 Line 13
+   14 Line 14
+   15 Line 15
+   $ ./a.out < tester Line
+    7 Line 7
+   12 Line 12
+   13 Line 13
+   14 Line 14
+   15 Line 15
+   $ ./a.out < tester kinoko
+   11 kinoko
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+今回も軽微なミスにより、Segmentation faultが出たが、変更範囲は少ないため、すぐ特定できた。デバッグしにくいので今後は要注意である。
+
+\section{感想}
+私が過去にポインタについて細かく学んだのはPythonの特殊な仕様を理解しようとしていたときである。\footnote{Pythonは一見値渡しに見えるが、実はすべて参照渡しである。値渡しに見えることが多いのはイミュータブルオブジェクトの仕様がやや特殊なせいである。}
+当時は少し難しく感じられたが一度理解すれば混乱することはたまにあるにせよ、難しく感じることはほとんどなくなった。しかし、2年生になって新たに理解が深まった点もあり、それはアセンブリとの対比である。「コンピュータシステムとOS」の授業ではアセンブリとしてCASL2を学習したが、それとの対比は有益であった。たとえば、mallocはDS命令とそっくりであったり、*(ptr+i)というのは指標レジスタの考え方をより便利にしたものである、などといったことが考えられるようになったのは理解を深めるのに有益であった。今回も特に新しく調べることはなかったので参考文献は設けていない。(どちらかというと、Segmentation faultに悩まされた。)
+
+今回のレポートは内容よりも解釈が一意に定まらない点で割と悩んだ。内部の実装を変更する問題では、題意が一意に定まるように記述し、出力が変更される問題では競技プログラミングの問題のように出力例があれば解答する上でよりミスマッチが発生しなくなると思われる。
 
 \end{document}
