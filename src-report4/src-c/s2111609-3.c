@@ -73,15 +73,6 @@ char* chomp(char* s){
     }
 }
 
-char* get_line(char* buf){
-    if(fgets(buf, BUFSIZE, stdin) != NULL){
-        chomp(buf);
-        return buf;
-    }else{
-        return NULL;
-    }
-}
-
 int main(int ac, char* av[]){
     struct LIST *list;
     int i;
@@ -103,7 +94,7 @@ int main(int ac, char* av[]){
         strcpy(line, buf);
         appendElement(list, line);
     }
-
+    puts("-----list content-----");
     printAllElements(list);
 
 }

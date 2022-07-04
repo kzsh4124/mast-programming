@@ -181,27 +181,46 @@ main関数ではそのままappendしていくlist1と昇順になっているli
 
 
 \section{設問(3)}
+\subsection{課題内容と方針}
+リストを文字列に対応させて入出力(ただし、改行文字は削除する)を行う課題である。
+
+基本的に指示通りの実装をすればよいが、文字列の受け取りは前回の課題を参考にする。
+
+\subsection{実装}
+まず、前問までの実装で本問には必要のない関数は削除した。
+また、int型を入力していた部分をchar*型に変更した。
+printAllElements関数では、\%dを\%sに変更して文字列として表示するように変更した。
+69行目からは改行文字を除外するのに必要なchomp関数を講義ノート(14)をもとに記述した。main関数ではbufで文字列を受け取り、その後に動的なメモリにコピーし、そのポインタをリストで管理している。
+\lstinputlisting[caption=s2111609-3.c,style=c]{./src-c/s2111609-3.c}
+
+\subsection{確認}
+動的なメモリ割り当てと、改行文字の削除は実装している。実行例では入力内容が1行ずつ表示されることを確認すれば要件を満たす。
 
 
 
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc s2111609-3.c -std=c89
+  $ ./a.out
+  abcd
+  1234
+  a
+  12334556
+  welcome
+  -----list content-----
+  abcd
+  1234
+  a
+  12334556
+  welcome
+\end{verbatim}
+\end{itembox}
 
+\subsection{難しかった点など}
+特になかった。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\section{感想}
+これは副次的なものではあるが、LinkedListの実装を通して、newキーワードの振る舞いやJavaのArrayListとLinkedListの違いを正しく理解することができた。また、設問(3)では、C89では使えないがgenericsの威力が実感できた。
 
 
 
