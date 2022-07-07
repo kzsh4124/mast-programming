@@ -2,10 +2,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "launch_cpp",
+            "name": "(gdb) Launch debug special",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src-report5/src-c/a.out",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [
+                "test1.csv",
+                "hoge"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: マイビルド",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "C/C++: gcc-9 アクティブ ファイルのビルドとデバッグ",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": ["test1.csv"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
@@ -17,8 +41,15 @@
                     "description": "gdb の再フォーマットを有効にする",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "逆アセンブリ フレーバーを Intel に設定",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "C/C++: gcc-9 アクティブなファイルのビルド",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }

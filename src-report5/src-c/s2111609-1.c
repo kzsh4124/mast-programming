@@ -41,7 +41,7 @@ struct LIST *initList(){
         exit(EXIT_FAILURE);
     }
 
-    l->h = getElement("");
+    l->h = getElement(NULL);
     l->t = l->h;
 
     return l;
@@ -71,7 +71,11 @@ void free_list(struct LIST *l){
     struct Element *now, *next;
     now = l->h;
     while(1){
-        free(now->val);
+        /* free string */
+        if(now->val != NULL){
+            free(now->val);
+        }
+        /* free Element */
         next = now->next;
         free(now);
         now = next;
@@ -79,6 +83,8 @@ void free_list(struct LIST *l){
             break;
         }
     }
+    /* free list */
+    free(l);
 }
 
 /* string control */
@@ -97,11 +103,13 @@ struct LIST* csv2list(char* str){
     int i;
     char* token; 
     char* head = str;
+    int len_str;
     char delim = ',';
     struct LIST* line = initList();
-
     chomp(str);
-    for(i=0; i<strlen(str)+1; i++){
+    len_str = strlen(str)+1;
+
+    for(i=0; i<len_str; i++){
         if(str[i]== delim || str[i]=='\0'){
             str[i] = '\0';
             token = (char*) malloc(strlen(head)+1);
@@ -142,7 +150,7 @@ int main(int ac, char* av[]){
 
         line_list = csv2list(buf);
         printAllElements(line_list);
-        //free_list(line_list);
+        free_list(line_list);
     }
     fclose(fp);
 }
