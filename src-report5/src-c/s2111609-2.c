@@ -121,36 +121,80 @@ struct LIST* csv2list(char* str){
     return line;
 }
 
+/* HTML control */
+void print_html_head(FILE* fp, char* title){
+    fprintf(fp, "<!DOCTIPE html>\n");
+    fprintf(fp, "<html>\n");
+    fprintf(fp,"<head>\n");
+    fprintf(fp, "<title>%s</title>\n", title);
+    fprintf(fp, "</head>\n");
+}
+void print_html_body_table(FILE* fp, char* heading){
+    fprintf(fp, "<body>\n");
+    fprintf(fp, "<h1>%s</h1>\n", heading);
+    fprintf(fp, "<table border=\"1\">\n");
+}
+void print_table_record(FILE* fp, struct LIST* l){
+    struct Element* e;
+    fprintf(fp, "<tr> ");
+    for(e=l->h->next; e != NULL; e = e->next){
+        fprintf(fp, "<td>%s</td> ", e->val);
+    }
+    fprintf(fp, "</tr>\n");
+}
+void print_html_close(FILE* fp){
+    fprintf(fp, "</table>\n");
+    fprintf(fp, "</body>\n");
+    fprintf(fp, "</html>\n");
+}
 
 int main(int ac, char* av[]){
-    FILE *fp;
+    FILE *fp_csv, *fp_html;
     char buf[BUFSIZE];
     struct LIST* line_list;
 
-    if(ac != 2){
+    /* you need input & output file name */
+    if(ac != 3){
         puts("invalid args!");
         exit(EXIT_FAILURE);
     }
-
-    fp = fopen(av[1], "r");
-    if(fp==NULL){
-        perror("fopen");
+    /* open csv */
+    fp_csv = fopen(av[1], "r");
+    if(fp_csv==NULL){
+        perror("fopen_csv");
+        exit(EXIT_FAILURE);
+    }
+    /* open html as write mode */
+    fp_html = fopen(av[2], "w");
+    if(fp_html == NULL){
+        perror("fopen_html");
         exit(EXIT_FAILURE);
     }
 
+    /* write html head */
+    print_html_head(fp_html, "csv2table");
+
+    /* write html body/table(start) */
+    print_html_body_table(fp_html, "csv2table");
+
+    /* convert csv to html table */
     while(1){
-        if(fgets(buf, BUFSIZE, fp) == NULL){
-            if(ferror(fp) != 0){
+        if(fgets(buf, BUFSIZE, fp_csv) == NULL){
+            if(ferror(fp_csv) != 0){
                 perror("fgets");
                 exit(EXIT_FAILURE);
             }else{
                 break;
             }
         }
-
         line_list = csv2list(buf);
         printAllElements(line_list);
+        print_table_record(fp_html, line_list);
         free_list(line_list);
     }
-    fclose(fp);
+    /*close html tags*/
+    print_html_close(fp_html);
+    /*close file stream*/
+    fclose(fp_csv);
+    fclose(fp_html);
 }

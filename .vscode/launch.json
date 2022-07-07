@@ -30,7 +30,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": ["test1.csv"],
+            "args": ["test1.csv", "table.html"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
