@@ -66,11 +66,226 @@ basewidth={0.57em,0.52em},
 \maketitle
 
 \section{はじめに}
-今回は文字列操作
+今回は文字列操作が主となる課題である。C言語における文字列操作はすなわちポインタ操作なので、安全性が低く、どちらかというとデバッグが大変である。そのため、gdbデバッガをうまく活用することが正しいコードへの近道となろう。
+
+\section{設問(1)}
+\subsection{課題内容と方針}\label{sec:q1}
+指示内容が多いので整理しておこう。
+\begin{itemize}
+  \item 文字列を受け取り連結リストを返す関数csv2listの実装。
+  \item csv2listで返されたlistが不要になった際にそのリストに割当てられたすべてのメモリを開放するfreelistの実装
+  \item main関数では実装した関数を用いて各要素をコンマを用いずにわかりやすく表示する
+\end{itemize}
+
+方針も順番に考えよう。前回のレポートの設問(3)で文字列の連結リストを作成したのでそれをベースに始めることにする。まずはcsv2list関数だが、これには大きく2つの動作が必要である。1つ目はコンマを利用して文字列を分割すること、2つ目は分割した部分列を動的メモリにコピーしたうえでそのポインタをリストに入れること、である。後者は前回までの関数を利用すればいいので今回大事なのは前者である。区切り文字による文字列の分割にはいろいろな方法が考えられると思うが、いちばん最初に思いつくstrtok関数は講義資料に載っていないという理由で利用できない。そこで、本設問により適した分割を次の方法で行う。
+\begin{enumerate}
+  \item コンマ付きの文字列のポインタを受け取る。
+  \item 前処理として、改行文字をヌル文字に置換する。
+  \item 分割した文字列の先頭を示すポインタheadを用意する。(最初は当然受け取った文字列の先頭を指している)
+  \item 先頭からコンマを探す、見つかったらヌル文字に置き換える。
+  \item headが示す文字列は分割された文字列の1つである。動的なメモリにコピーしてから連結リストに入れる。
+  \item headをヌル文字に置き換えた文字の1つ次の文字を指すようにする。
+  \item 続きからコンマを探す。以後文字列終了(ヌル文字の登場)まで繰り返す。
+\end{enumerate}
+次にfreelist関数を考える。listを与えたときに解放する必要があるのは
+\begin{itemize}
+  \item 各ノードが参照する文字列
+  \item 各ノード
+  \item リスト
+\end{itemize}
+の3つであり、それを解放すればよい。
+
+最後に、main関数での表示であるが、これはprintAllElements関数を改造することにする。一つのリストにつきブレースで囲い、各要素は改行することで実現する。
+
+\subsection{実装}
+69行目までは前回のレポートから引っ張ってきた連結リストとその操作関数の定義である。
+ただし、printAllElements関数内の63,67行目では前の小節で述べたように、表示したときにブレースで囲われるようにだけ改造している。
+
+70行目からはfreelist関数であり、コメントにある通り、各Elementが参照する文字列、各Element、連結リスト自体の3つを解放するようにした。
+
+90行目からは前回も利用した改行削除のchomp関数なので説明は割愛する。
+
+100行目からはcsv2list関数である。
+変数について説明すると、iはループ変数、tokenは分割で得られた要素を保管するための動的に与えられたメモリのポインタが入る。headは探索中の部分文字列の先頭番地が入り、len\_strは最初に与えられた文字列の長さ(ヌル文字を含む)を入れる。delimはデリミタであり、今回はカンマが入っている。lineは返却するリストである。
+
+110行目で改行を削除してヌル文字を挿入している。
+112行目のforで最初に与えられた文字列のすべての文字(ヌル文字を含む)に関して探索する。現在の文字がデリミタもしくはヌル文字(すなわち、与えられた文字列の終端)のとき、現在の文字をヌル文字に置き換え、headを起点とした文字列として読み取る。読み取られた文字列は、動的なメモリにコピーされ、appendElement関数でリストにそのポインタtokenを入れる。そして、headを次の文字列の開始番地に変更する。これを文字列の終端まで繰り返す。
+
+129行目からのmain関数ではコマンドライン引数を確認してから、139行目でファイルを読み込みモードでopenしている。145行目から一行ずつ読み込みをしており、例外処理のあとにcsv2list関数でlistをつくり、printAllElements関数で表示し、freelistで解放している。
+すべての行の読み込みが終了したらファイルをcloseしている。
+
+\lstinputlisting[caption=s2111609-1.c,style=c]{./src-c/s2111609-1.c}
+
+\subsection{確認}
+設問条件の(1-1)(1-2)(1-3)は \ref{sec:q1}節から確認しつつすべて盛り込んできた。また、文字列はcsv2list関数内で動的なメモリに保管している。細やかな部分はデバッガで確認した。2つの大きさの異なるCSVファイルを与えて期待する実行結果が出ていることを確認しよう。2つのCSVファイルを以下のように定義した。
+
+\begin{itembox}[l]{test1.csv}
+\begin{verbatim}
+  name,birthday,ID,belong
+  Yamada,0402,1,mast
+  Tanaka,0801,2,mast
+  Suzuki,1013,3,klis
+  Sato,1111,4,coins
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{test2.csv}
+\begin{verbatim}
+  name,birthday,ID,belong,HP,MP
+  Yamada,0402,1,mast,100,10
+  Tanaka,0801,2,mast,50,30
+  Suzuki,1013,3,klis,150,3
+  Sato,1111,4,coins,30,80
+  Lucy,0725,5,esys,40,60
+  Steven,0819,6,med,90,80
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{実行例1}
+\begin{verbatim}
+  $ gcc s2111609-1.c -std=c89
+  $ ./a.out test1.csv
+  {
+    name
+    birthday
+    ID
+    belong
+    }
+    {
+    Yamada
+    0402
+    1
+    mast
+    }
+    {
+    Tanaka
+    0801
+    2
+    mast
+    }
+    {
+    Suzuki
+    1013
+    3
+    klis
+    }
+    {
+    Sato
+    1111
+    4
+    coins
+    }
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{実行例2}
+\begin{verbatim}
+  $./a.out test2.csv
+  {
+    name
+    birthday
+    ID
+    belong
+    HP
+    MP
+    }
+    {
+    Yamada
+    0402
+    1
+    mast
+    100
+    10
+    }
+    {
+    Tanaka
+    0801
+    2
+    mast
+    50
+    30
+    }
+    {
+    Suzuki
+    1013
+    3
+    klis
+    150
+    3
+    }
+  -------- 以下略 --------
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+細やかなデバッグが大変であった。デバッガがなければだいぶ厳しかったかもしれない。
 
 
+\section{設問(2)}
+\subsection{課題内容と方針}
+csvをHTMLのテーブルに変換して、最低限の体裁の整ったHTMLファイルに出力する課題である。
+
+方針は、とにかくfprintf関数でHTMLを出力することになるが、main関数が見やすいようにほかの関数にまとめていくことにする。とくに重要なのはリストを受け取ってHTMLのレコードをつくる関数である。1行をtrタグで囲み、各要素をtdタグで囲むというまとまりを出力すればよい。
+
+\subsection{実装}
+前問との変更点を説明する。124行目からHTMLの体裁を出力する関数群を定義している。これらの関数は最低限書き込むファイルのファイルポインタを受け取る。print\_html\_head関数はtitleの文字列を受け取り、head部分までのHTMLを出力する。
+print\_html\_body\_table関数は見出しの文字列を受け取り、tableタグ(開始)までを出力する。次のprint\_table\_record関数はprintAllElementsをもとにして、要素をたどる前と後にtrタグを構成している部分と、printfをfprintfにして、各要素をtdで挟むようにフォーマットする部分を変更した。
+print\_html\_close関数ではtableのレコードが出力された後に記述するべき終了タグを出力する。
+
+main関数ではコマンドライン引数を確認したあと、CSVファイルを読み込みモード、htmlファイルを書き込みモードで開き、先程定義した関数print\_html\_headとprint\_html\_body\_tableによりtableのレコードを記述する直前までのHTMLを出力している。
+180行目からはCSVの各行を読み込み、リストを作成し、一応printAllElements関数で標準出力をしたあと、print\_table\_record関数により、レコードを出力している。
+その後、必要なくなったリストは解放している。この処理を繰り返し行っている。
+すべての行を出力したあとにはprint\_html\_close関数により、終了タグを出力して、開いていた2つのファイルをcloseしている。
+
+\lstinputlisting[caption=s2111609-2.c,style=c]{./src-c/s2111609-2.c}
+
+\subsection{確認}
+本問ではほぼfprintfを用いたHTMLの出力の関数しかしていないのでまずは正しくHTMLが出力されることを以下の実行例から確認しよう。要求されている体裁が整っており、閉じるべきすべてのタグが閉じられていて、すべての要素がテーブルになっていることが確認できる。一部枠からはみ出してしまうのでレポート内で折り返しているが、実際にはtrの開始から終了までが1行で表示される。
+
+また、実装では、openやfgetsなどの例外処理も正しくなされている。
+
+\begin{itembox}[l]{実行例}
+\begin{verbatim}
+  $ gcc s2111609-2.c -srd=c89
+  $ ./a.out test1.csv test1.html
+  $ ./a.out test2.csv test2.html
+\end{verbatim}
+\end{itembox}
 
 
+\begin{itembox}[l]{test1.html}
+\begin{verbatim}
+<!DOCTYPE html>
+<html>
+<head>
+<title>csv2table</title>
+</head>
+<body>
+<h1>csv2table</h1>
+<table border="1">
+<tr> <td>name</td> <td>birthday</td> <td>ID</td> <td>belong</td>
+  </tr>
+<tr> <td>Yamada</td> <td>0402</td> <td>1</td> <td>mast</td> </tr>
+<tr> <td>Tanaka</td> <td>0801</td> <td>2</td> <td>mast</td> </tr>
+<tr> <td>Suzuki</td> <td>1013</td> <td>3</td> <td>klis</td> </tr>
+<tr> <td>Sato</td> <td>1111</td> <td>4</td> <td>coins</td> </tr>
+</table>
+</body>
+</html>  
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{test2.html}
+\begin{verbatim}
+(略)(枠に収まりきらないため。添付しているのでそちらを参照)
+\end{verbatim}
+\end{itembox}
+
+\subsection{難しかった点など}
+こちらは特になかった。
 
 
-\end{}
+\section{感想}
+今回の問題は考え方自体はそこまで複雑ではないが、非常にデバッグが大変であった。デバッガが使える環境を構築できたのは今後C/C++を書くときに大きなメリットとなるだろう。特に調べないといけない内容はなかったので参考文献はないが、VSCodeとgdbデバッガの出力は非常に参考になったのでそれをもって参考文献の代わりとする。
+
+\end{document}

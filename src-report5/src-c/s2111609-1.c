@@ -67,7 +67,7 @@ void printAllElements(struct LIST *l){
     puts("}");
 }
 
-void free_list(struct LIST *l){
+void freelist(struct LIST *l){
     struct Element *now, *next;
     now = l->h;
     while(1){
@@ -113,6 +113,10 @@ struct LIST* csv2list(char* str){
         if(str[i]== delim || str[i]=='\0'){
             str[i] = '\0';
             token = (char*) malloc(strlen(head)+1);
+            if(token == NULL){
+                puts("memory allocation error!");
+                exit(EXIT_FAILURE);
+            }
             strcpy(token, head);
             appendElement(line, token);
             head = &str[i+1];
@@ -150,7 +154,7 @@ int main(int ac, char* av[]){
 
         line_list = csv2list(buf);
         printAllElements(line_list);
-        free_list(line_list);
+        freelist(line_list);
     }
     fclose(fp);
 }
