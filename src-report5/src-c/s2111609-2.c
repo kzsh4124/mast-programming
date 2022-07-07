@@ -123,7 +123,7 @@ struct LIST* csv2list(char* str){
 
 /* HTML control */
 void print_html_head(FILE* fp, char* title){
-    fprintf(fp, "<!DOCTIPE html>\n");
+    fprintf(fp, "<!DOCTYPE html>\n");
     fprintf(fp, "<html>\n");
     fprintf(fp,"<head>\n");
     fprintf(fp, "<title>%s</title>\n", title);
